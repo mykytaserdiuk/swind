@@ -6,6 +6,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/nikitaserdiuk9/swind/pkg/bus"
 	"github.com/nikitaserdiuk9/swind/pkg/element"
+	"github.com/nikitaserdiuk9/swind/pkg/models"
 	"github.com/nikitaserdiuk9/swind/pkg/render"
 )
 
@@ -16,6 +17,7 @@ type GameScene struct {
 	elements []element.Base
 	b        bus.Bus
 
+	text     string
 	workArea rl.Rectangle
 }
 
@@ -24,6 +26,7 @@ func NewGameScene(renderer render.Renderer, b bus.Bus) *GameScene {
 	menu := &GameScene{
 		name: "game",
 		b:    b,
+		text: text,
 		r:    renderer,
 		elements: []element.Base{
 			element.NewWritableText(
@@ -42,6 +45,7 @@ func NewGameScene(renderer render.Renderer, b bus.Bus) *GameScene {
 					Width:  222,
 					Height: 100,
 				},
+				len(text)+1,
 				b,
 			),
 			element.NewTextVisualizator(
@@ -61,15 +65,36 @@ func (s *GameScene) Name() string {
 	return s.name
 }
 
+func (s *GameScene) matchPercent(input string) (percent int, ok bool) {
+	runesA := []rune(s.text)
+	runesB := []rune(input)
+	if len(runesA) == len(runesB) && len(runesA) > 0 {
+		matches := 0
+		for i := range runesA {
+			if runesA[i] == runesB[i] {
+				matches++
+			}
+		}
+		percent = int(float64(matches) * 100.0 / float64(len(runesA)))
+		return percent, true
+	}
+	return 0, false
+}
+
 func (s *GameScene) OnEnter() {
 	fmt.Println("Game Enter")
-	// s.b.Subscribe(bus.UIEvent, func(e bus.Event) {
-	// 	if event, ok := e.Data.(models.UIEvent); ok {
-	// 		s.onEvent(event)
-	// 	} else {
-	// 		fmt.Println("Unvalid event: ", e.Data)
-	// 	}
-	// })
+	s.b.Subscribe(bus.StateUpdate, func(e bus.Event) {
+		if data, ok := e.Data.(models.UIEvent); ok {
+			if data.Type == "input_text" {
+				if percent, ok := s.matchPercent(data.ID); ok {
+					s.b.Emit(bus.Event{
+						Type: bus.StateUpdate,
+						Data: GameoverEvent{Score: percent},
+					})
+				}
+			}
+		}
+	})
 }
 
 func (s *GameScene) OnExit() {

@@ -32,6 +32,11 @@ func NewSceneManager(r render.Renderer, b bus.Bus) *SceneManager {
 			fmt.Println("Unvalid scene name: ", e.Data)
 		}
 	})
+	sceneManager.bus.Subscribe(bus.StateUpdate, func(e bus.Event) {
+		if event, ok := e.Data.(GameoverEvent); ok {
+			fmt.Println(event)
+		}
+	})
 
 	return sceneManager
 }

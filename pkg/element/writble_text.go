@@ -45,7 +45,7 @@ func (t *WritableText) Draw(r render.Renderer) {
 		Fn: func() {
 			for i, seg := range t.text {
 				color := rl.Black
-				if i < len(t.currentText) {
+				if i < len(t.currentText) || len(t.text) == len(t.currentText) {
 					color = rl.Lime
 				}
 				rl.DrawTextEx(font, string(seg), rl.NewVector2(x, t.rect.Y), t.fontSize, 30, color)

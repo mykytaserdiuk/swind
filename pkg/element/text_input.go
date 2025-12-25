@@ -1,12 +1,11 @@
 package element
 
 import (
-	"fmt"
+	"strings"
 
 	rg "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/nikitaserdiuk9/swind/pkg/bus"
-	"github.com/nikitaserdiuk9/swind/pkg/input"
 	"github.com/nikitaserdiuk9/swind/pkg/models"
 	"github.com/nikitaserdiuk9/swind/pkg/render"
 )
@@ -16,35 +15,26 @@ type TextInput struct {
 	input string
 
 	prevText string
+	maxText  int
 
-	dragging   bool
-	dragOffset rl.Vector2
-	b          bus.Bus
+	b bus.Bus
 }
 
-func NewTextInput(rect rl.Rectangle, b bus.Bus) *TextInput {
-	return &TextInput{rect: rect, b: b}
+func NewTextInput(rect rl.Rectangle, max int, b bus.Bus) *TextInput {
+	return &TextInput{rect: rect, b: b, maxText: max}
 }
 
 func (i *TextInput) HandleInput() bool {
-	mx, my := input.MousePos.X, input.MousePos.Y
-
-	over := rl.CheckCollisionPointRec(input.MousePos, i.rect)
-
-	if input.MouseLeftPressed && over {
-		i.dragging = true
-		i.dragOffset = rl.NewVector2(mx-i.rect.X, my-i.rect.Y)
-	}
-
-	if !input.MouseLeftDown && i.dragging {
-		i.dragging = false
-		return true
-	}
-
-	return i.dragging || over
+	return false
 }
 
 func (i *TextInput) Update(dt float32) {
+	i.input = strings.ToUpper(i.input)
+	if len(i.prevText) > len(i.input) {
+		i.input = i.prevText
+		return
+	}
+
 	if i.prevText != i.input {
 		i.b.Emit(bus.Event{
 			Type: bus.StateUpdate,
@@ -53,16 +43,8 @@ func (i *TextInput) Update(dt float32) {
 				ID:   i.input,
 			},
 		})
-		i.prevText = i.input
-		fmt.Println(i.input)
-	}
 
-	if i.dragging {
-		if i.dragging {
-			mx, my := input.MousePos.X, input.MousePos.Y
-			i.rect.X = mx - i.dragOffset.X
-			i.rect.Y = my - i.dragOffset.Y
-		}
+		i.prevText = i.input
 	}
 }
 
@@ -70,8 +52,7 @@ func (i *TextInput) Draw(r render.Renderer) {
 	r.Submit(render.DrawCmd{
 		Layer: models.LayerContent,
 		Fn: func() {
-			// rg.TextInputBox(i.rect, "title", "meessage", "OK", &i.input, 100, &i.isSelected)
-			rg.TextBox(i.rect, &i.input, 500, true)
+			rg.TextBox(i.rect, &i.input, i.maxText, true)
 		},
 	})
 }
