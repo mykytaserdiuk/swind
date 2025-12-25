@@ -1,0 +1,1 @@
+Replace color login from `Draw()` into `Update()`

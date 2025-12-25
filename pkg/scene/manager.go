@@ -1,0 +1,53 @@
+package scene
+
+import (
+	"fmt"
+
+	"github.com/nikitaserdiuk9/swind/pkg/bus"
+	"github.com/nikitaserdiuk9/swind/pkg/render"
+)
+
+type SceneManager struct {
+	scenes       map[string]Scene
+	currentScene Scene
+	bus          bus.Bus
+}
+
+func NewSceneManager(r render.Renderer, b bus.Bus) *SceneManager {
+	menuScene := NewMenuScene(r, b)
+	gameScene := NewGameScene(r, b)
+	sceneManager := &SceneManager{
+		currentScene: nil,
+		bus:          b,
+		scenes: map[string]Scene{
+			menuScene.Name(): menuScene,
+			gameScene.Name(): gameScene,
+		},
+	}
+
+	sceneManager.bus.Subscribe(bus.SwitchScene, func(e bus.Event) {
+		if name, ok := e.Data.(string); ok {
+			sceneManager.SwitchScene(name)
+		} else {
+			fmt.Println("Unvalid scene name: ", e.Data)
+		}
+	})
+
+	return sceneManager
+}
+
+func (sm *SceneManager) Update(dt float32) {
+	sm.currentScene.Update(dt)
+}
+
+func (sm *SceneManager) Draw() {
+	sm.currentScene.Draw()
+}
+
+func (sm *SceneManager) SwitchScene(name string) {
+	if sm.currentScene != nil {
+		sm.currentScene.OnExit()
+	}
+	sm.currentScene = sm.scenes[name]
+	sm.currentScene.OnEnter()
+}
