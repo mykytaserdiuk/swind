@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/nikitaserdiuk9/swind/pkg/bus"
+	"github.com/mykytaserdiuk/fluxo"
 	"github.com/nikitaserdiuk9/swind/pkg/element"
 	"github.com/nikitaserdiuk9/swind/pkg/models"
 	"github.com/nikitaserdiuk9/swind/pkg/render"
@@ -15,12 +15,12 @@ type MenuScene struct {
 
 	r        render.Renderer
 	elements []element.Base
-	b        bus.Bus
+	b        fluxo.Bus
 
 	workArea rl.Rectangle
 }
 
-func NewMenuScene(renderer render.Renderer, b bus.Bus) *MenuScene {
+func NewMenuScene(renderer render.Renderer, b fluxo.Bus) *MenuScene {
 	menu := &MenuScene{
 		name: "menu",
 		b:    b,
@@ -51,7 +51,7 @@ func (s *MenuScene) Name() string {
 func (s *MenuScene) OnEnter() {
 	fmt.Println("Menu Enter")
 
-	s.b.Subscribe(bus.UIEvent, func(e bus.Event) {
+	s.b.Subscribe(models.UIevent, func(e models.Event) {
 		fmt.Println("EEE")
 		s.onEvent(e)
 	})
@@ -84,13 +84,13 @@ func (s *MenuScene) Draw() {
 	s.r.Flush()
 }
 
-func (sm *MenuScene) onEvent(e bus.Event) {
+func (sm *MenuScene) onEvent(e models.Event) {
 	switch ev := e.Data.(type) {
 	case models.UIEvent:
 		switch ev.Type {
 		case "button_click":
 			if ev.ID == "Exit" {
-				sm.b.Emit(bus.Event{Type: bus.SwitchScene, Data: "game"})
+				sm.b.Emit(models.SwitchScene, models.Event{Type: models.SwitchScene, Data: "game"})
 			}
 		}
 	}

@@ -3,10 +3,9 @@ package app
 import (
 	"fmt"
 	"os"
-	"time"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/nikitaserdiuk9/swind/pkg/bus"
+	"github.com/mykytaserdiuk/fluxo"
 	"github.com/nikitaserdiuk9/swind/pkg/input"
 	"github.com/nikitaserdiuk9/swind/pkg/render"
 	"github.com/nikitaserdiuk9/swind/pkg/scene"
@@ -18,7 +17,7 @@ type Application struct {
 	sceneManager              *scene.SceneManager
 	camera                    *rl.Camera2D
 	input                     *input.InputSystem
-	bus                       bus.Bus
+	bus                       fluxo.Bus
 }
 
 func NewApplication(width, height int32) *Application {
@@ -26,7 +25,7 @@ func NewApplication(width, height int32) *Application {
 
 	cam := rl.NewCamera2D(rl.NewVector2(0, 0), rl.NewVector2(0, 0), 0, 1)
 
-	bus := bus.NewMessageBus()
+	bus := fluxo.NewEventBus()
 	renderer := render.NewRaylibRender(&cam)
 	sceneManager := scene.NewSceneManager(renderer, bus)
 	input := input.NewInputSystem()
@@ -49,8 +48,8 @@ func (app *Application) Run() {
 	defer func() {
 		for {
 			if err := recover(); err != nil { //catch
+				// TODO write to log.txt
 				fmt.Fprintf(os.Stderr, "Exception: %v\n", err)
-				time.Sleep(time.Second * 10)
 				os.Exit(1)
 			}
 		}

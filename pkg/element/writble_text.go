@@ -2,7 +2,7 @@ package element
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/nikitaserdiuk9/swind/pkg/bus"
+	"github.com/mykytaserdiuk/fluxo"
 	"github.com/nikitaserdiuk9/swind/pkg/models"
 	"github.com/nikitaserdiuk9/swind/pkg/render"
 )
@@ -13,17 +13,17 @@ type WritableText struct {
 	currentText string
 	fontSize    float32
 
-	bus bus.Bus
+	bus fluxo.Bus
 }
 
-func NewWritableText(rect rl.Rectangle, b bus.Bus, text string) *WritableText {
+func NewWritableText(rect rl.Rectangle, b fluxo.Bus, text string) *WritableText {
 	wt := &WritableText{
 		bus:      b,
 		rect:     rect,
 		text:     text,
-		fontSize: 20,
+		fontSize: 40,
 	}
-	wt.bus.Subscribe(bus.StateUpdate, func(e bus.Event) {
+	wt.bus.Subscribe(models.StateUpdate, func(e models.Event) {
 		if data, ok := e.Data.(models.UIEvent); ok {
 			if data.Type == "input_text" {
 				wt.currentText = data.ID
@@ -44,7 +44,7 @@ func (t *WritableText) Draw(r render.Renderer) {
 		Layer: models.LayerContent,
 		Fn: func() {
 			for i, seg := range t.text {
-				color := rl.Black
+				color := rl.DarkBlue
 				if i < len(t.currentText) || len(t.text) == len(t.currentText) {
 					color = rl.Lime
 				}

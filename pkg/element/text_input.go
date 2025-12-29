@@ -5,7 +5,7 @@ import (
 
 	rg "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/nikitaserdiuk9/swind/pkg/bus"
+	"github.com/mykytaserdiuk/fluxo"
 	"github.com/nikitaserdiuk9/swind/pkg/models"
 	"github.com/nikitaserdiuk9/swind/pkg/render"
 )
@@ -17,10 +17,10 @@ type TextInput struct {
 	prevText string
 	maxText  int
 
-	b bus.Bus
+	b fluxo.Bus
 }
 
-func NewTextInput(rect rl.Rectangle, max int, b bus.Bus) *TextInput {
+func NewTextInput(rect rl.Rectangle, max int, b fluxo.Bus) *TextInput {
 	return &TextInput{rect: rect, b: b, maxText: max}
 }
 
@@ -36,8 +36,8 @@ func (i *TextInput) Update(dt float32) {
 	}
 
 	if i.prevText != i.input {
-		i.b.Emit(bus.Event{
-			Type: bus.StateUpdate,
+		i.b.Emit(models.StateUpdate, models.Event{
+			Type: models.StateUpdate,
 			Data: models.UIEvent{
 				Type: "input_text",
 				ID:   i.input,

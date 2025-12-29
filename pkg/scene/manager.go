@@ -3,17 +3,18 @@ package scene
 import (
 	"fmt"
 
-	"github.com/nikitaserdiuk9/swind/pkg/bus"
+	"github.com/mykytaserdiuk/fluxo"
+	"github.com/nikitaserdiuk9/swind/pkg/models"
 	"github.com/nikitaserdiuk9/swind/pkg/render"
 )
 
 type SceneManager struct {
 	scenes       map[string]Scene
 	currentScene Scene
-	bus          bus.Bus
+	bus          fluxo.Bus
 }
 
-func NewSceneManager(r render.Renderer, b bus.Bus) *SceneManager {
+func NewSceneManager(r render.Renderer, b fluxo.Bus) *SceneManager {
 	menuScene := NewMenuScene(r, b)
 	gameScene := NewGameScene(r, b)
 	sceneManager := &SceneManager{
@@ -25,14 +26,14 @@ func NewSceneManager(r render.Renderer, b bus.Bus) *SceneManager {
 		},
 	}
 
-	sceneManager.bus.Subscribe(bus.SwitchScene, func(e bus.Event) {
+	sceneManager.bus.Subscribe(models.SwitchScene, func(e models.Event) {
 		if name, ok := e.Data.(string); ok {
 			sceneManager.SwitchScene(name)
 		} else {
 			fmt.Println("Unvalid scene name: ", e.Data)
 		}
 	})
-	sceneManager.bus.Subscribe(bus.StateUpdate, func(e bus.Event) {
+	sceneManager.bus.Subscribe(models.StateUpdate, func(e models.Event) {
 		if event, ok := e.Data.(GameoverEvent); ok {
 			fmt.Println(event)
 		}

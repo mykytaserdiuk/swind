@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/nikitaserdiuk9/swind/pkg/bus"
+	"github.com/mykytaserdiuk/fluxo"
 	"github.com/nikitaserdiuk9/swind/pkg/element"
 	"github.com/nikitaserdiuk9/swind/pkg/models"
 	"github.com/nikitaserdiuk9/swind/pkg/render"
@@ -15,47 +15,54 @@ type GameScene struct {
 
 	r        render.Renderer
 	elements []element.Base
-	b        bus.Bus
+	b        fluxo.Bus
 
 	text     string
 	workArea rl.Rectangle
 }
 
-func NewGameScene(renderer render.Renderer, b bus.Bus) *GameScene {
+func NewGameScene(renderer render.Renderer, b fluxo.Bus) *GameScene {
 	text := "WACHALA"
 	menu := &GameScene{
 		name: "game",
 		b:    b,
 		text: text,
 		r:    renderer,
-		elements: []element.Base{
-			element.NewWritableText(
-				rl.Rectangle{
-					X:      100,
-					Y:      100,
-					Width:  222,
-					Height: 222,
-				},
-				b, text,
-			),
-			element.NewTextInput(
-				rl.Rectangle{
-					X:      100,
-					Y:      333,
-					Width:  222,
-					Height: 100,
-				},
-				len(text)+1,
-				b,
-			),
-			element.NewTextVisualizator(
-				rl.Rectangle{
-					X:      float32(300),
-					Y:      float32(300),
-					Width:  222,
-					Height: 222,
-				}, b, text),
-		},
+		// Layout: center main text and input horizontally, visualizer to the right
+		elements: func() []element.Base {
+			winW := float32(1280)
+			winH := float32(720)
+			// layout sizes
+			mainW := float32(700)
+			mainH := float32(120)
+			inputW := mainW
+			inputH := float32(64)
+			visualW := float32(600)
+			visualH := float32(160)
+
+			// center everything horizontally
+			centerX := (winW - mainW) / 2
+			visualX := (winW - visualW) / 2
+
+			// visualizator higher and centered, writable text centered below it, input at bottom
+			visualY := float32(80)
+			topY := visualY + visualH + 18
+			inputY := winH - inputH - 72
+
+			return []element.Base{
+				element.NewTextVisualizator(
+					rl.Rectangle{X: visualX, Y: visualY, Width: visualW, Height: visualH}, b, text),
+				element.NewWritableText(
+					rl.Rectangle{X: centerX, Y: topY, Width: mainW, Height: mainH},
+					b, text,
+				),
+				element.NewTextInput(
+					rl.Rectangle{X: centerX, Y: inputY, Width: inputW, Height: inputH},
+					len(text)+1,
+					b,
+				),
+			}
+		}(),
 	}
 
 	return menu
@@ -83,12 +90,12 @@ func (s *GameScene) matchPercent(input string) (percent int, ok bool) {
 
 func (s *GameScene) OnEnter() {
 	fmt.Println("Game Enter")
-	s.b.Subscribe(bus.StateUpdate, func(e bus.Event) {
+	s.b.Subscribe(models.StateUpdate, func(e models.Event) {
 		if data, ok := e.Data.(models.UIEvent); ok {
 			if data.Type == "input_text" {
 				if percent, ok := s.matchPercent(data.ID); ok {
-					s.b.Emit(bus.Event{
-						Type: bus.StateUpdate,
+					s.b.Emit(models.StateUpdate, models.Event{
+						Type: models.StateUpdate,
 						Data: GameoverEvent{Score: percent},
 					})
 				}
@@ -124,9 +131,9 @@ func (s *GameScene) Draw() {
 
 // func (sm *GameScene) onEvent(event models.UIEvent) {
 // 	switch event.EventType {
-// 	case bus.ButtonClick:
+// 	case models.ButtonClick:
 // 		if event.ID == "Exit" {
-// 			sm.b.Emit(bus.Event{Type: bus.SwitchScene, Data: "menu"})
+// 			sm.b.Emit(models.Event{Type: models.SwitchScene, Data: "menu"})
 // 		}
 // 	}
 // }

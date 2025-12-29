@@ -3,7 +3,7 @@ package element
 import (
 	rg "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/nikitaserdiuk9/swind/pkg/bus"
+	"github.com/mykytaserdiuk/fluxo"
 	"github.com/nikitaserdiuk9/swind/pkg/input"
 	"github.com/nikitaserdiuk9/swind/pkg/models"
 	"github.com/nikitaserdiuk9/swind/pkg/render"
@@ -11,11 +11,11 @@ import (
 
 type Button struct {
 	rect    rl.Rectangle
-	bus     bus.Bus
+	bus     fluxo.Bus
 	focused bool
 }
 
-func NewButton(rect rl.Rectangle, bus bus.Bus) *Button {
+func NewButton(rect rl.Rectangle, bus fluxo.Bus) *Button {
 	return &Button{rect: rect, bus: bus}
 }
 
@@ -38,7 +38,7 @@ func (b *Button) Draw(r render.Renderer) {
 		Layer: models.LayerContent,
 		Fn: func() {
 			if rg.Button(b.rect, "Exit") {
-				b.bus.Emit(bus.Event{Type: bus.UIEvent, Data: models.UIEvent{ID: "Exit", Type: "button_click"}})
+				b.bus.Emit(models.UIevent, models.Event{Type: models.UIevent, Data: models.UIEvent{ID: "Exit", Type: "button_click"}})
 			}
 		},
 	})

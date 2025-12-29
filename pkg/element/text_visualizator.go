@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/nikitaserdiuk9/swind/pkg/bus"
+	"github.com/mykytaserdiuk/fluxo"
 	"github.com/nikitaserdiuk9/swind/pkg/models"
 	"github.com/nikitaserdiuk9/swind/pkg/render"
 )
@@ -13,18 +13,19 @@ type TextVisualizator struct {
 	rect        rl.Rectangle
 	text        string
 	currentText string
-
-	bus bus.Bus
+	fontSize    float32
+	bus         fluxo.Bus
 }
 
-func NewTextVisualizator(rect rl.Rectangle, b bus.Bus, txt string) *TextVisualizator {
+func NewTextVisualizator(rect rl.Rectangle, b fluxo.Bus, txt string) *TextVisualizator {
 	tv := &TextVisualizator{
-		rect: rect,
-		bus:  b,
-		text: strings.ToUpper(txt),
+		rect:     rect,
+		bus:      b,
+		fontSize: 45,
+		text:     strings.ToUpper(txt),
 	}
 
-	tv.bus.Subscribe(bus.StateUpdate, func(e bus.Event) {
+	tv.bus.Subscribe(models.StateUpdate, func(e models.Event) {
 		if data, ok := e.Data.(models.UIEvent); ok {
 			if data.Type == "input_text" {
 				if len(data.ID) > len(tv.text) {
@@ -53,8 +54,8 @@ func (v *TextVisualizator) Draw(r render.Renderer) {
 				if string(seg) == string(v.text[i]) {
 					color = rl.DarkGreen
 				}
-				rl.DrawTextEx(font, string(seg), rl.NewVector2(x, v.rect.Y), 20, 30, color)
-				x += rl.MeasureTextEx(font, string(seg), 20, 30).X + 2
+				rl.DrawTextEx(font, string(seg), rl.NewVector2(x, v.rect.Y), v.fontSize, 30, color)
+				x += rl.MeasureTextEx(font, string(seg), v.fontSize, 30).X + 2.5
 			}
 		},
 	})

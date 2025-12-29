@@ -6,6 +6,8 @@ github.com/gen2brain/raylib-go/raygui v0.0.0-20251219174542-17d5a83d1c33 h1:0QCK
 github.com/gen2brain/raylib-go/raygui v0.0.0-20251219174542-17d5a83d1c33/go.mod h1:Ji/uPEko2AUkcyPLAelEUa+E8Npc89/XY5Fo/lS/e3I=
 github.com/gen2brain/raylib-go/raylib v0.55.1 h1:1rdc10WvvYjtj7qijHnV9T38/WuvlT6IIL+PaZ6cNA8=
 github.com/gen2brain/raylib-go/raylib v0.55.1/go.mod h1:BaY76bZk7nw1/kVOSQObPY1v1iwVE1KHAGMfvI6oK1Q=
+github.com/mykytaserdiuk/fluxo v0.0.0-20251228120813-c5357b8fa86e h1:IByHj614/osfXTFuwkGDFSDdcwJzTBna+8MNZfbcvBE=
+github.com/mykytaserdiuk/fluxo v0.0.0-20251228120813-c5357b8fa86e/go.mod h1:ZM0f0BZCfjq2oW24tNG3wEULeLRUwwHlNL7R93kkOJk=
 golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 h1:vr/HnozRka3pE4EsMEg1lgkXJkTFJCVUX+S/ZT6wYzM=
 golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842/go.mod h1:XtvwrStGgqGPLc4cjQfWqZHG1YFdYs6swckp8vpsjnc=
 golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f h1:XdNn9LlyWAhLVp6P/i8QYBW+hlyhrhei9uErw2B5GJo=
